@@ -9,12 +9,16 @@ public class SoundVisual : MonoBehaviour
     public float rmsValue;
     public float dbValue;
     public float pitchValue;
-    
+
     public float maxVisualScale = 25.0f;
     public float visualModifier = 175.0f;
     public float smoothSpeed = 10.0f;
     public float keepPercentage = 0.25f;
     public float threshold = 0.02f;      // minimum amplitude to extract pitch
+
+    public Material backgroundMaterial;
+    public Color minColor;
+    public Color maxColor;
 
     private AudioSource source;
     private float[] samples;
@@ -30,32 +34,67 @@ public class SoundVisual : MonoBehaviour
         samples = new float[SAMPLE_SIZE];
         spectrum = new float[SAMPLE_SIZE];
         sampleRate = AudioSettings.outputSampleRate;
-
-        SpawnLine();
+        SetBackground();
+        // SpawnLine();
+        SpawnCircle();
     }
 
     private void SpawnLine() {
         visualScale = new float[amnVisual];
         visualList = new Transform[amnVisual];
 
+        // Creates amnVisual cubes right next to each other 
         for (int i = 0; i < amnVisual; i++) {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube) as GameObject;
+            // Can change the primitive type for a different "look"
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere) as GameObject;
             visualList[i] = go.transform;
             visualList[i].position = Vector3.right * i;
         }
     }
 
+    private void SpawnCircle() {
+        visualScale = new float[amnVisual];
+        visualList = new Transform[amnVisual]; 
+
+        Vector3 center = Vector3.zero;
+        float radius = 10.0f;
+
+        for (int i = 0; i < amnVisual; i++) {
+            float ang = i * 1.0f / amnVisual;
+            ang = ang * Mathf.PI * 2;
+
+            float x = center.x + Mathf.Cos(ang) * radius;
+            float y = center.y + Mathf.Sin(ang) * radius;
+
+            Vector3 pos = center + new Vector3(x, y, 0);
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube) as GameObject;
+            go.transform.position = pos;
+            go.transform.rotation = Quaternion.LookRotation(Vector3.forward, pos);
+            visualList[i] = go.transform;
+        }
+
+    }
+
+    // Called every second 
     private void Update() {
+        // Music values updated every second 
         AnalyzeSound();
+        // Visual is updated every second 
         UpdateVisual();
+        SetBackground();
+    }
+
+    // Implement this however we want -based off of pitch and db
+    private void SetBackground()
+    {
+        Camera.main.backgroundColor = Color.white;
     }
 
     private void UpdateVisual() {
-        int visualIndex = 0;
         int spectrumIndex = 0;
         int averageSize = (int)((SAMPLE_SIZE * keepPercentage) / amnVisual);
 
-        while (visualIndex < amnVisual) {
+        for (int visualIndex = 0; visualIndex < amnVisual; visualIndex++) {
             int j = 0;
             float sum = 0;
             while (j < averageSize) {
@@ -74,10 +113,10 @@ public class SoundVisual : MonoBehaviour
             }
 
             visualList[visualIndex].localScale = Vector3.one + Vector3.up * visualScale[visualIndex];
-            visualIndex++;
         }
     }
 
+    // This code analyzes the input mp3 using digital signal processing -- not from us 
     private void AnalyzeSound() {
         source.GetOutputData(samples, 0);
 
