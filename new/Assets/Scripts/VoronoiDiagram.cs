@@ -11,12 +11,15 @@ public class VoronoiDiagram : MonoBehaviour {
     // This is where we will store the resulting data
     private Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
- 
+    Voronoi voronoi;
+    int count;
+    
     void Start() {
         // Scale the quad 
-        var quadHeight = Camera.main.orthographicSize * 2.0;
-        var quadWidth = quadHeight * Screen.width / Screen.height;
-        this.GetComponent<Renderer>().localScale = new Vector3(quadWidth, quadHeight, 1);
+        Vector3 temp = transform.localScale;
+        temp.x = 10.0f;
+        temp.y = 10.0f;
+        transform.localScale = temp;
 
         // Create your sites (lets call that the center of your polygons)
         List<Vector2f> points = CreateRandomPoint();
@@ -28,7 +31,7 @@ public class VoronoiDiagram : MonoBehaviour {
        
         // There is a two ways you can create the voronoi diagram: with or without the lloyd relaxation
         // Here I used it with 2 iterations of the lloyd relaxation
-        Voronoi voronoi = new Voronoi(points,bounds,100);
+        voronoi = new Voronoi(points,bounds);
  
         // Now retreive the edges from it, and the new sites position if you used lloyd relaxtion
         sites = voronoi.SitesIndexedByLocation;
@@ -37,6 +40,12 @@ public class VoronoiDiagram : MonoBehaviour {
         DisplayVoronoiDiagram();
     }
    
+    void Update() {
+        voronoi.LloydRelaxation(count);
+        count++;
+        count = count%10;
+    }
+
     private List<Vector2f> CreateRandomPoint() {
         // Use Vector2f, instead of Vector2
         // Vector2f is pretty much the same than Vector2, but like you could run Voronoi in another thread

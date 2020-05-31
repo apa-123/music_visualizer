@@ -57,7 +57,7 @@ public class SoundVisual : MonoBehaviour
         visualList = new Transform[amnVisual]; 
 
         Vector3 center = Vector3.zero;
-        float radius = 10.0f;
+        float radius = 5.0f;
 
         for (int i = 0; i < amnVisual; i++) {
             float ang = i * 1.0f / amnVisual;
