@@ -13,6 +13,11 @@ public class VoronoiDiagram : MonoBehaviour {
     private List<Edge> edges;
  
     void Start() {
+        // Scale the quad 
+        var quadHeight = Camera.main.orthographicSize * 2.0;
+        var quadWidth = quadHeight * Screen.width / Screen.height;
+        this.GetComponent<Renderer>().localScale = new Vector3(quadWidth, quadHeight, 1);
+
         // Create your sites (lets call that the center of your polygons)
         List<Vector2f> points = CreateRandomPoint();
        
@@ -23,11 +28,7 @@ public class VoronoiDiagram : MonoBehaviour {
        
         // There is a two ways you can create the voronoi diagram: with or without the lloyd relaxation
         // Here I used it with 2 iterations of the lloyd relaxation
-        Voronoi voronoi = new Voronoi(points,bounds,5);
- 
-        // But you could also create it without lloyd relaxtion and call that function later if you want
-        //Voronoi voronoi = new Voronoi(points,bounds);
-        //voronoi.LloydRelaxation(5);
+        Voronoi voronoi = new Voronoi(points,bounds,100);
  
         // Now retreive the edges from it, and the new sites position if you used lloyd relaxtion
         sites = voronoi.SitesIndexedByLocation;
