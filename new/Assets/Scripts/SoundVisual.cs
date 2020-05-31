@@ -72,7 +72,6 @@ public class SoundVisual : MonoBehaviour
             go.transform.rotation = Quaternion.LookRotation(Vector3.forward, pos);
             visualList[i] = go.transform;
         }
-
     }
 
     // Called every second 
@@ -113,6 +112,7 @@ public class SoundVisual : MonoBehaviour
             }
 
             visualList[visualIndex].localScale = Vector3.one + Vector3.up * visualScale[visualIndex];
+            visualList[visualIndex].GetComponent<Renderer>().material.color = new Color(pitchValue/4, 4, 1) ;            
         }
     }
 

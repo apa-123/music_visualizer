@@ -9,7 +9,7 @@ public class VoronoiDiagram : MonoBehaviour {
     public int polygonNumber = 200;
  
     // This is where we will store the resulting data
-    private Dictionary<Vector2f, Site> sites;
+    public Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
     Voronoi voronoi;
     int count;
@@ -17,9 +17,13 @@ public class VoronoiDiagram : MonoBehaviour {
     void Start() {
         // Scale the quad 
         Vector3 temp = transform.localScale;
-        temp.x = 10.0f;
-        temp.y = 10.0f;
+        temp.x = 25.0f;
+        temp.y = 25.0f;
         transform.localScale = temp;
+
+        Vector3 pos = transform.localPosition;
+        pos.z = 3;
+        transform.localPosition = pos;
 
         // Create your sites (lets call that the center of your polygons)
         List<Vector2f> points = CreateRandomPoint();
@@ -42,8 +46,19 @@ public class VoronoiDiagram : MonoBehaviour {
    
     void Update() {
         voronoi.LloydRelaxation(count);
+        sites = voronoi.SitesIndexedByLocation;
+        edges = voronoi.Edges;
+ 
+        DisplayVoronoiDiagram();
+
         count++;
         count = count%10;
+
+        if (count == 1) {
+            List<Vector2f> points = CreateRandomPoint();
+            Rectf bounds = new Rectf(0,0,512,512);
+            voronoi = new Voronoi(points,bounds);
+        }
     }
 
     private List<Vector2f> CreateRandomPoint() {
