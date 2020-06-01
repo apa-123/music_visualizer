@@ -9,9 +9,10 @@ public class SoundVisual : MonoBehaviour
     public float rmsValue;
     public float dbValue;
     public float pitchValue;
+    public bool keyPressed;
 
     public float maxVisualScale = 25.0f;
-    public float visualModifier = 175.0f;
+    public float visualModifier = 50.0f;
     public float smoothSpeed = 10.0f;
     public float keepPercentage = 0.25f;
     public float threshold = 0.02f;      // minimum amplitude to extract pitch
@@ -19,6 +20,7 @@ public class SoundVisual : MonoBehaviour
     public Material backgroundMaterial;
     public Color minColor;
     public Color maxColor;
+    private Color currentColor;
 
     private AudioSource source;
     private float[] samples;
@@ -34,11 +36,13 @@ public class SoundVisual : MonoBehaviour
         samples = new float[SAMPLE_SIZE];
         spectrum = new float[SAMPLE_SIZE];
         sampleRate = AudioSettings.outputSampleRate;
+        
         SetBackground();
         // SpawnLine();
         SpawnCircle();
     }
 
+    // This function creates a line of cubes rather than a circle 
     private void SpawnLine() {
         visualScale = new float[amnVisual];
         visualList = new Transform[amnVisual];
@@ -52,6 +56,7 @@ public class SoundVisual : MonoBehaviour
         }
     }
 
+    // Similar to SpawnLine, but creates a circle of cubes 
     private void SpawnCircle() {
         visualScale = new float[amnVisual];
         visualList = new Transform[amnVisual]; 
@@ -76,6 +81,12 @@ public class SoundVisual : MonoBehaviour
 
     // Called every second 
     private void Update() {
+        // if (Input.GetKeyDown(KeyCode.Space)) {
+        //     keyPressed = !keyPressed;
+        //     SpawnLine();
+        // } else {
+        //     SpawnCircle();
+        // }
         // Music values updated every second 
         AnalyzeSound();
         // Visual is updated every second 
@@ -112,11 +123,11 @@ public class SoundVisual : MonoBehaviour
             }
 
             visualList[visualIndex].localScale = Vector3.one + Vector3.up * visualScale[visualIndex];
-            visualList[visualIndex].GetComponent<Renderer>().material.color = new Color(pitchValue/4, 4, 1) ;            
+            visualList[visualIndex].GetComponent<Renderer>().material.color = currentColor;            
         }
     }
 
-    // This code analyzes the input mp3 using digital signal processing -- not from us 
+    // This code analyzes the input mp3 using digital signal processing -- from youtube video as well 
     private void AnalyzeSound() {
         source.GetOutputData(samples, 0);
 
@@ -154,5 +165,31 @@ public class SoundVisual : MonoBehaviour
             freqN += 0.5f * (dR * dR - dL * dL);
         }
         pitchValue = freqN * (sampleRate / 2) / SAMPLE_SIZE;
+
+        // Based on pitch, modify the current color 
+        // Added by us based on the values of the input song pitch
+        currentColor = Color.white;
+        if (pitchValue <= 1600) {
+            currentColor = Color.grey;
+        }
+        if (pitchValue <= 1200) {
+            currentColor = Color.red;
+        }
+        if (pitchValue <= 800) {
+            currentColor = Color.blue;
+        }
+        if (pitchValue <= 600) {
+            currentColor = Color.cyan;
+        }
+        if (pitchValue <= 400) {
+            currentColor = Color.green;
+        }
+        if (pitchValue <= 250) {
+            currentColor = Color.magenta;
+        }
+        if (pitchValue <= 50) {
+            currentColor = Color.black;
+        }
+
     }
 }

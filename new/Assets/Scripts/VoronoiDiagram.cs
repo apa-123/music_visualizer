@@ -3,6 +3,7 @@ using System.Collections.Generic;
  
 using csDelaunay;
  
+// This class was written by the library creator, we modified it to fit our desired results 
 public class VoronoiDiagram : MonoBehaviour {
  
     // The number of polygons/sites we want
@@ -21,6 +22,7 @@ public class VoronoiDiagram : MonoBehaviour {
         temp.y = 25.0f;
         transform.localScale = temp;
 
+        // Modify the position of the model
         Vector3 pos = transform.localPosition;
         pos.z = 3;
         transform.localPosition = pos;
@@ -44,6 +46,7 @@ public class VoronoiDiagram : MonoBehaviour {
         DisplayVoronoiDiagram();
     }
    
+   // Created to generate a Voronoi animation with Lloyd relaxation applied 
     void Update() {
         voronoi.LloydRelaxation(count);
         sites = voronoi.SitesIndexedByLocation;
@@ -77,13 +80,17 @@ public class VoronoiDiagram : MonoBehaviour {
     private void DisplayVoronoiDiagram() {
         Texture2D tx = new Texture2D(512,512);
         foreach (KeyValuePair<Vector2f,Site> kv in sites) {
-            tx.SetPixel((int)kv.Key.x, (int)kv.Key.y, Color.red);
+            tx.SetPixel((int)kv.Key.x, (int)kv.Key.y, Color.black);
         }
         foreach (Edge edge in edges) {
             // if the edge doesn't have clippedEnds, if was not within the bounds, dont draw it
             if (edge.ClippedEnds == null) continue;
- 
-            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, Color.black);
+            Color random = new Color(
+                Random.Range(0f, 1f), 
+                Random.Range(0f, 1f), 
+                Random.Range(0f, 1f)
+            );
+            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, random);
         }
         tx.Apply();
  
